@@ -11,7 +11,7 @@ const createItem = async (req, res) => {
     ) {
       return res.status(403).json({
         status: "error",
-        message: "Unauthorized: Insufficient permissions"
+        message: "Unauthorized: Insufficient permissions",
       });
     }
 
@@ -22,7 +22,7 @@ const createItem = async (req, res) => {
     if (!itemName || itemType === undefined || quantity === undefined) {
       return res.status(400).json({
         status: "error",
-        message: "Input is incomplete"
+        message: "Input is incomplete",
       });
     }
 
@@ -30,7 +30,7 @@ const createItem = async (req, res) => {
     if (!Object.values(ItemType).includes(itemType)) {
       return res.status(400).json({
         status: "error",
-        message: "Invalid item type"
+        message: "Invalid item type",
       });
     }
 
@@ -38,7 +38,7 @@ const createItem = async (req, res) => {
     if (quantity < 0) {
       return res.status(400).json({
         status: "error",
-        message: "Quantity must be non-negative"
+        message: "Quantity must be non-negative",
       });
     }
 
@@ -53,12 +53,12 @@ const createItem = async (req, res) => {
     if (existingItem) {
       return res.status(400).json({
         status: "error",
-        message: "Item name already exists"
+        message: "Item name already exists",
       });
     }
 
     // Set default imgUrl if no imgData provided
-    const imgUrl = imgData || "-";
+    const imgUrl = req.imageUrl || "-";
 
     // Create new item with quantity assigned to both fields
     const newItem = new Item({
@@ -69,7 +69,7 @@ const createItem = async (req, res) => {
       quantityOnHand: quantity,
       quantityForInvoice: quantity,
       unitType,
-      imgUrl,
+      imgUrl: imgUrl,
     });
 
     await newItem.save();
@@ -77,18 +77,16 @@ const createItem = async (req, res) => {
     res.status(201).json({
       status: "success",
       message: "Item created successfully",
-      content: newItem
+      content: newItem,
     });
   } catch (err) {
     console.error("Error in createItem:", err);
     res.status(500).json({
       status: "error",
-      message: "Error creating item: " + err.message
+      message: "Error creating item: " + err.message,
     });
   }
 };
-
-
 
 const updateItem = async (req, res) => {
   try {
@@ -96,10 +94,10 @@ const updateItem = async (req, res) => {
     if (
       req.role !== BusinessRole.BUSINESS_ADMIN &&
       req.role !== BusinessRole.ACCOUNTANT
-    )  {
+    ) {
       return res.status(403).json({
         status: "error",
-        message: "Unauthorized: Insufficient permissions"
+        message: "Unauthorized: Insufficient permissions",
       });
     }
 
@@ -110,15 +108,15 @@ const updateItem = async (req, res) => {
     if (!itemName || quantity === undefined) {
       return res.status(400).json({
         status: "error",
-        message: "Input is incomplete"
+        message: "Input is incomplete",
       });
     }
 
     // Validate quantity is non-negative
-    if (quantity < 0){
+    if (quantity < 0) {
       return res.status(400).json({
         status: "error",
-        message: "Quantity must be non-negative"
+        message: "Quantity must be non-negative",
       });
     }
 
@@ -133,7 +131,7 @@ const updateItem = async (req, res) => {
     if (!existingItem) {
       return res.status(404).json({
         status: "error",
-        message: "Item not found"
+        message: "Item not found",
       });
     }
     // Check for duplicate item name (excluding current item)
@@ -146,7 +144,7 @@ const updateItem = async (req, res) => {
     if (duplicateItem) {
       return res.status(400).json({
         status: "error",
-        message: "Item name already exists"
+        message: "Item name already exists",
       });
     }
 
@@ -170,13 +168,13 @@ const updateItem = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Item updated successfully",
-      content: updatedItem
+      content: updatedItem,
     });
-  } catch (err){
+  } catch (err) {
     console.error("Error in updateItem:", err);
     res.status(500).json({
       status: "error",
-      message: "Error updating item: " + err.message
+      message: "Error updating item: " + err.message,
     });
   }
 };
@@ -190,7 +188,7 @@ const deleteItem = async (req, res) => {
     ) {
       return res.status(403).json({
         status: "error",
-        message: "Unauthorized: Insufficient permissions"
+        message: "Unauthorized: Insufficient permissions",
       });
     }
 
@@ -207,23 +205,22 @@ const deleteItem = async (req, res) => {
     if (!deletedItem) {
       return res.status(404).json({
         status: "error",
-        message: "Item not found"
+        message: "Item not found",
       });
     }
 
     res.status(200).json({
       status: "success",
-      message: "Item deleted successfully"
+      message: "Item deleted successfully",
     });
   } catch (err) {
     console.error("Error in deleteItem:", err);
     res.status(500).json({
       status: "error",
-      message: "Error deleting item: " + err.message
+      message: "Error deleting item: " + err.message,
     });
   }
 };
-
 
 const getItemsByType = async (req, res) => {
   try {
@@ -234,7 +231,8 @@ const getItemsByType = async (req, res) => {
     if (!type || !["product", "service", "all"].includes(type.toLowerCase())) {
       return res.status(400).json({
         status: "error",
-        message: "Invalid type parameter. Must be 'product', 'service', or 'all'"
+        message:
+          "Invalid type parameter. Must be 'product', 'service', or 'all'",
       });
     }
 
@@ -267,17 +265,16 @@ const getItemsByType = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Items retrieved successfully",
-      content: formattedItems
+      content: formattedItems,
     });
-  } catch (err)  {
+  } catch (err) {
     console.error("Error in getItemsByType:", err);
     res.status(500).json({
       status: "error",
-      message: "Error retrieving items: " + err.message
+      message: "Error retrieving items: " + err.message,
     });
   }
 };
-
 
 const getItemById = async (req, res) => {
   try {
@@ -293,7 +290,7 @@ const getItemById = async (req, res) => {
     if (!item) {
       return res.status(404).json({
         status: "error",
-        message: "Item not found"
+        message: "Item not found",
       });
     }
 
@@ -311,17 +308,16 @@ const getItemById = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Item retrieved successfully",
-      content: formattedItem
+      content: formattedItem,
     });
   } catch (err) {
     console.error("Error in getItemById:", err);
     res.status(500).json({
       status: "error",
-      message: "Error retrieving item: " + err.message
+      message: "Error retrieving item: " + err.message,
     });
   }
 };
-
 
 const updateItemQuantity = async (req, res) => {
   try {
@@ -332,7 +328,7 @@ const updateItemQuantity = async (req, res) => {
     ) {
       return res.status(403).json({
         status: "error",
-        message: "Unauthorized: Insufficient permissions"
+        message: "Unauthorized: Insufficient permissions",
       });
     }
 
@@ -343,7 +339,7 @@ const updateItemQuantity = async (req, res) => {
     if (quantity === undefined || quantity < 0) {
       return res.status(400).json({
         status: "error",
-        message: "Invalid quantity: must be a non-negative number"
+        message: "Invalid quantity: must be a non-negative number",
       });
     }
 
@@ -361,23 +357,23 @@ const updateItemQuantity = async (req, res) => {
       }
     );
 
-    if (!updatedItem){
+    if (!updatedItem) {
       return res.status(404).json({
         status: "error",
-        message: "Item not found"
+        message: "Item not found",
       });
     }
 
     // Just return success message
     res.status(200).json({
       status: "success",
-      message: "Item quantity updated successfully"
+      message: "Item quantity updated successfully",
     });
   } catch (err) {
     console.error("Error in updateItemQuantity:", err);
     res.status(500).json({
       status: "error",
-      message: "Error updating item quantity: " + err.message
+      message: "Error updating item quantity: " + err.message,
     });
   }
 };
