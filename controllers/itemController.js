@@ -149,7 +149,7 @@ const updateItem = async (req, res) => {
     }
 
     // Set default imgUrl if no imgData provided
-    const imgUrl = imgData || existingItem.imgUrl;
+    const imgUrl = req.imageUrl || existingItem.imgUrl;
 
     // Update item
     const updatedItem = await Item.findOneAndUpdate(
@@ -160,7 +160,7 @@ const updateItem = async (req, res) => {
         quantityOnHand: quantity,
         quantityForInvoice: quantity,
         unitType,
-        imgUrl,
+        imgUrl: imgUrl,
       },
       { new: true } // Return the updated document
     );
