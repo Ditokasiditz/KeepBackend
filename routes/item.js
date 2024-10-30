@@ -3,6 +3,8 @@ const express = require("express");
 const router = express.Router();
 const verifyJWT = require("../middlewares/verifyJWT");
 const verifyRole = require("../middlewares/checkBusinessRole");
+const { upload, uploadToImgur } = require("../middlewares/imgur");
+const uploadErrorHandler = require("../middlewares/errorHandler");
 const {
   createItem,
   updateItem,
@@ -37,7 +39,15 @@ Outputs:
     Status 500 Server error
 --------------------------------------------
 */
-router.post("/business/:businessID/item", verifyJWT, verifyRole, createItem);
+router.post(
+  "/business/:businessID/item",
+  verifyJWT,
+  verifyRole,
+  upload.single("image"), // 'image' will be the field name in form-data
+  uploadToImgur,
+  uploadErrorHandler,
+  createItem
+);
 
 /* 
 --------------------------------------------
@@ -67,6 +77,9 @@ router.put(
   "/business/:businessID/item/:itemID",
   verifyJWT,
   verifyRole,
+  upload.single("image"),
+  uploadToImgur,
+  uploadErrorHandler,
   updateItem
 );
 
